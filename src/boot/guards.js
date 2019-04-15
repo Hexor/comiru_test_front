@@ -18,6 +18,9 @@ export default async ({ app, router, Vue }) => {
       if (to.path === '/auth/switch' && tokenType !== 'line') {
         router.push({ path: '/auth' })
       }
+    } else if (to.path === '/auth/line') {
+      // 绑定line帐号
+      console.log(to.path)
     } else {
       // 本地不存在任何用户身份信息
       if (to.path !== '/auth') {

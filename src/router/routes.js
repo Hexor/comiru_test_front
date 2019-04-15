@@ -14,7 +14,14 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/Login.vue') },
       { path: 'switch', component: () => import('pages/AuthSwitch.vue') },
-      { path: 'register', component: () => import('pages/Register.vue') }
+      { path: 'register', component: () => import('pages/Register.vue') },
+      { path: 'line',
+        component: () => import('pages/BindLine.vue'),
+        props: (route) => ({
+          access_token: route.query.access_token,
+          expires_in: route.query.expires_in
+        })
+      }
     ]
   }
 ]

@@ -56,6 +56,7 @@
             <q-btn style="width: 170px; background-color: #00C300; color:white"
                    icon="fab fa-line"
                    class="col"
+                   @click="lineBtnCallback"
                    label="使用 Line 登录"/>
           </div>
 
@@ -88,6 +89,47 @@ export default {
     }
   },
   methods: {
+    lineBtnCallback () {
+      const that = this
+      const authWin =
+        window.open('https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1564192144&redirect_uri=http://127.0.0.1:8000/api/line_auth_callback&state=12345&scope=openid', '_blank', 'width=600,height=400,menubar=no,toolbar=no,location=no')
+
+      const checkLineToken = setInterval(function () {
+        console.log('start check')
+        const token = that.$q.localStorage.getItem('line_access_token')
+        const tokenExpireTS =
+          that.$q.localStorage.getItem('line_token_expire_at')
+
+        const nowTS = new Date()
+        if (token && tokenExpireTS > nowTS) {
+          authWin.close()
+          that.$q.notify({
+            color: 'lineColor',
+            textColor: 'white',
+            icon: 'fab fa-line',
+            message: '绑定 Line 成功! ',
+            timeout: 3000
+          })
+          that.$router.push({ path: '/auth/switch' })
+          clearInterval(checkLineToken)
+        }
+      }, 500)
+
+      setTimeout(function () {
+        clearInterval(checkLineToken)
+      }, 30000)
+
+      // 轮询是否授权成功，授权成功后关闭小窗，并刷新页面
+      // var timerId = setInterval(function(){
+      //   $.getJSON("你的授权是否成功的轮询地址?相关参数", function(response){
+      //     if (response.授权成功){
+      //       clearInterval(timerId)
+      //       authWin.close()
+      //       window.location.reload()
+      //     }
+      //   })
+      // }, 500)
+    },
     onSubmit () {
       this.$refs.username.validate()
       this.$refs.password.validate()
