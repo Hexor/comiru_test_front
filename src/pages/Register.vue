@@ -46,8 +46,8 @@
             :rules="[ val => val && val.length > 0 || 'Please type something']"
           />
 
-          <q-radio v-model="signupType" val="teacher" label="我是教师"/>
           <q-radio v-model="signupType" val="student" label="我是学员"/>
+          <q-radio v-model="signupType" val="teacher" label="我是教师"/>
 
           <div class="row items-center justify-between">
             <q-btn class="col"
@@ -85,7 +85,7 @@ export default {
     return {
       formHasError: false,
 
-      signupType: 'teacher',
+      signupType: 'student',
       loading: false,
       nickname: null,
       username: null,
@@ -103,10 +103,7 @@ export default {
         // we're done, we reset loading state
       }, 3000)
     },
-    onSubmit (form) {
-      console.log('onsub')
-      console.log()
-
+    onSubmit () {
       this.$refs.username.validate()
       this.$refs.nickname.validate()
       this.$refs.password.validate()
@@ -118,16 +115,9 @@ export default {
       ) {
         this.formHasError = true
         return
-      } else {
-        // this.$q.notify({
-        //   icon: 'done',
-        //   color: 'positive',
-        //   message: 'Submitted'
-        // })
       }
 
       this.loading = true
-      console.log(form)
       const that = this
       axios.post('auth/signup', {
         username: that.username,

@@ -8,6 +8,7 @@ export default async ({ app, router, Vue }) => {
 
     const nowTS = new Date()
     if (token && tokenExpireTS > nowTS) {
+      // 本地存在已经登录的用户身份
       if ((to.path === '/student' && tokenType !== 'student') ||
         (to.path === '/teacher' && tokenType !== 'teacher')
       ) {
@@ -18,6 +19,7 @@ export default async ({ app, router, Vue }) => {
         router.push({ path: '/auth' })
       }
     } else {
+      // 本地不存在任何用户身份信息
       if (to.path !== '/auth') {
         router.push({ path: '/auth' })
       }
