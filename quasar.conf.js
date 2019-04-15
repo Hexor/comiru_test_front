@@ -48,8 +48,26 @@ module.exports = function (ctx) {
 
       // Quasar plugins
       plugins: [
-        'Notify'
-      ]
+        'LocalStorage',
+        'SessionStorage',
+        'Notify',
+        'Loading',
+        'Dialog'
+      ],
+      config: {
+        notify: { timeout: 1000 },
+        brand: {
+          primary: '#03a9f4',
+          secondary: '#64b5f6',
+          accent: '#ff80ab',
+
+          positive: '#21BA45',
+          negative: '#C10015',
+          info: '#0288D1',
+          warning: '#F2C037'
+        },
+        loading: { /* Loading defaults */ }
+      }
 
       // iconSet: 'ionicons-v4'
       // lang: 'de' // Quasar language
@@ -75,13 +93,17 @@ module.exports = function (ctx) {
     },
 
     devServer: {
+      before (app) {
+        const cors = require('cors')
+        app.use(cors())
+      },
       // https: true,
       // port: 8080,
       open: true // opens browser window automatically
     },
 
-    // animations: 'all' --- includes all animations
-    animations: [],
+    animations: 'all',
+    // animations: [],
 
     ssr: {
       pwa: false

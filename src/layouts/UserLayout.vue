@@ -13,8 +13,12 @@
         </q-btn>
 
         <q-toolbar-title>
-          Comiru School
+          Comiru
         </q-toolbar-title>
+        <q-avatar >
+          <q-img style="width:28px; height: 28px"
+                 src="/assets/logo.png"></q-img>
+        </q-avatar>
 
         <!--<div>Quasar v{{ $q.version }}</div>-->
       </q-toolbar>

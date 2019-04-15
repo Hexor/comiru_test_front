@@ -37,16 +37,17 @@
             </template>
           </q-input>
 
-          <!--<q-input-->
-          <!--filled-->
-          <!--v-model="name"-->
-          <!--label="昵称"-->
-          <!--lazy-rules-->
-          <!--:rules="[ val => val && val.length > 0 || 'Please type something']"-->
-          <!--/>-->
+          <q-input
+            filled
+            ref="nickname"
+            v-model="nickname"
+            label="昵称"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
 
-          <!--<q-radio v-model="registerType" val="teacher" label="我是教师"/>-->
-          <!--<q-radio v-model="registerType" val="student" label="我是学员"/>-->
+          <q-radio v-model="signupType" val="teacher" label="我是教师"/>
+          <q-radio v-model="signupType" val="student" label="我是学员"/>
 
           <div class="row items-center justify-between">
             <q-btn class="col"
@@ -84,9 +85,9 @@ export default {
     return {
       formHasError: false,
 
-      registerType: 'teacher',
+      signupType: 'teacher',
       loading: false,
-      name: null,
+      nickname: null,
       username: null,
 
       accept: false,
@@ -104,11 +105,17 @@ export default {
     },
     onSubmit (form) {
       console.log('onsub')
+      console.log()
 
       this.$refs.username.validate()
+      this.$refs.nickname.validate()
       this.$refs.password.validate()
 
-      if (this.$refs.username.hasError || this.$refs.password.hasError) {
+      if (
+        this.$refs.username.hasError ||
+          this.$refs.nickname.hasError ||
+          this.$refs.password.hasError
+      ) {
         this.formHasError = true
         return
       } else {
@@ -122,28 +129,40 @@ export default {
       this.loading = true
       console.log(form)
       const that = this
-      axios.post(this.APIPrefix + 'bus', form)
+      axios.post('auth/signup', {
+        username: that.username,
+        password: that.password,
+        nickname: that.nickname,
+        signup_type: that.signupType
+      })
         .then((response) => {
           this.$q.notify({
             color: 'info',
             icon: 'thumb_up',
-            message: '发布成功! ',
+            message: '注册成功 !',
             timeout: 500
           })
-
-          that.$q.loading.hide({ delay: 500 })
-          if (form['bus_request_type'] === 'is_driver') {
-            that.$router.push({ path: 'buses' })
-          } else {
-            that.$router.push({ path: 'passengers' })
-          }
+          const nowTS = new Date()
+          that.$q.localStorage.set('access_token', response.data.access_token)
+          that.$q.localStorage.set('token_type', that.signupType)
+          that.$q.localStorage.set('token_expire_at', nowTS.getTime() + response.data.expires_in * 1000)
+          that.$router.push({ path: '/' })
         })
-        .catch(function (error) {
-          // handle error
-          console.log(error)
+        .catch((errorResponse) => {
+          const errors = errorResponse.response.data.errors
+          console.log(errors)
+          let errorMessage = ''
+          for (var i in errors) {
+            errorMessage = errorMessage + errors[i] + ' '
+          }
+          that.$q.notify({
+            multiLine: true,
+            color: 'negative',
+            message: errorMessage
+          })
         })
         .then(function () {
-          // always executed
+          that.loading = false
         })
     },
 
