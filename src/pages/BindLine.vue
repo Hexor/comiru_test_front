@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md absolute-center" style=" max-width: 500px">
-        <div class="text-subtitle1">您已经绑定 Line 成功, 请稍等...</div>
+        <div class="text-subtitle1">正在绑定 Line, 请稍等...</div>
   </div>
 </template>
 

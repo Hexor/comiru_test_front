@@ -1,6 +1,6 @@
 <template>
-  <div class="q-pa-md" style="max-width: 500px">
-    <q-card bordered class="">
+  <div class="q-pa-md full-width absolute-center" style="max-width:500px">
+    <q-card bordered>
       <q-card-section>
         <div class="text-h6">登录 Comiru</div>
       </q-card-section>
@@ -55,14 +55,15 @@
           <div class="row items-center">
             <q-btn style="width: 170px; background-color: #00C300; color:white"
                    icon="fab fa-line"
+                   v-show="!this.isLineTokenInLocal()"
                    class="col"
                    @click="lineBtnCallback"
-                   label="使用 Line 登录"/>
+                   :label="lineBtnText"/>
           </div>
 
           <div class="row items-center">
             <q-btn
-              @click="$router.push('/auth/register')"
+              @click="registerBtnCallback"
               class="col" flat color="primary">没有帐号? 现在注册
             </q-btn>
           </div>
@@ -80,6 +81,7 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      lineBtnText: '使用 Line 登录',
       loading: false,
       formHasError: false,
       signupType: 'student',
@@ -88,47 +90,20 @@ export default {
       username: null
     }
   },
+  mounted: function () {
+    if (this.isLineTokenInLocal()) {
+    }
+  },
   methods: {
+    registerBtnCallback () {
+      if (this.isLineTokenInLocal()) {
+        this.$router.push('/auth/bind_register')
+      } else {
+        this.$router.push('/auth/register')
+      }
+    },
     lineBtnCallback () {
-      const that = this
-      const authWin =
-        window.open('https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1564192144&redirect_uri=http://127.0.0.1:8000/api/line_auth_callback&state=12345&scope=openid', '_blank', 'width=600,height=400,menubar=no,toolbar=no,location=no')
-
-      const checkLineToken = setInterval(function () {
-        console.log('start check')
-        const token = that.$q.localStorage.getItem('line_access_token')
-        const tokenExpireTS =
-          that.$q.localStorage.getItem('line_token_expire_at')
-
-        const nowTS = new Date()
-        if (token && tokenExpireTS > nowTS) {
-          authWin.close()
-          that.$q.notify({
-            color: 'lineColor',
-            textColor: 'white',
-            icon: 'fab fa-line',
-            message: '绑定 Line 成功! ',
-            timeout: 3000
-          })
-          that.$router.push({ path: '/auth/switch' })
-          clearInterval(checkLineToken)
-        }
-      }, 500)
-
-      setTimeout(function () {
-        clearInterval(checkLineToken)
-      }, 30000)
-
-      // 轮询是否授权成功，授权成功后关闭小窗，并刷新页面
-      // var timerId = setInterval(function(){
-      //   $.getJSON("你的授权是否成功的轮询地址?相关参数", function(response){
-      //     if (response.授权成功){
-      //       clearInterval(timerId)
-      //       authWin.close()
-      //       window.location.reload()
-      //     }
-      //   })
-      // }, 500)
+      this.startLoginAsLineProcess()
     },
     onSubmit () {
       this.$refs.username.validate()
@@ -149,22 +124,36 @@ export default {
         signup_type: that.signupType
       })
         .then((response) => {
-          this.$q.notify({
-            color: 'info',
-            icon: 'thumb_up',
-            message: '登录成功 !',
-            timeout: 500
-          })
           const nowTS = new Date()
-          that.$q.localStorage.set('access_token', response.data.access_token)
-          that.$q.localStorage.set('token_type', that.signupType)
-          that.$q.localStorage.set('token_expire_at', nowTS.getTime() + response.data.expires_in * 1000)
-          that.$router.push({ path: '/' })
+          that.$q.localStorage.set('line_exist_in_server',
+            response.data.line_exist_in_server)
+          that.updateLocalStorageTokenInfo(
+            response.data.access_token,
+            that.signupType,
+            nowTS.getTime() + response.data.expires_in * 1000
+          )
+
+          if (that.isLineTokenInLocal()) {
+            that.bindSignInTokenWithLineToken()
+          } else {
+            this.$q.notify({
+              color: 'info',
+              icon: 'thumb_up',
+              message: '登录成功 !',
+              timeout: 500
+            })
+
+            if (that.$route.path === '/auth/bind_login') {
+              that.$router.push({ path: '/auth/switch' })
+            } else {
+              that.$router.push({ path: '/' })
+            }
+          }
         })
         .catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
-          if (errorResponse.response.status >= 400 &&
-            errorResponse.response.status < 500) {
+          let errorMessage = errorResponse.message
+          if (errorResponse.status >= 400 &&
+              errorResponse.status < 500) {
             errorMessage = '登录验证失败, 用户不存在或者密码错误'
           }
           that.$q.notify({

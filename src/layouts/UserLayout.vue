@@ -25,60 +25,40 @@
     </q-header>
 
     <q-drawer
+      @input="clickDrawerCallback"
       v-model="leftDrawerOpen"
       bordered
       content-class="bg-grey-2"
     >
       <q-list>
-        <q-item-label header>Essential Links</q-item-label>
-        <q-item clickable tag="a" target="_blank"
-                href="http://v1.quasar-framework.org">
+        <q-item clickable @click="$router.push('/auth/switch')"
+                v-show="isShowSwitch">
           <q-item-section avatar>
-            <q-icon name="school"/>
+            <q-icon name="people"/>
           </q-item-section>
           <q-item-section>
-            <q-item-label>Docs</q-item-label>
-            <q-item-label caption>v1.quasar-framework.org</q-item-label>
+            <q-item-label>切换帐号</q-item-label>
+            <q-item-label caption>切换到或者绑定其他帐号</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank"
-                href="https://github.com/quasarframework/">
+        <q-item clickable @click="bindLineCallback" v-show="isShowBind">
           <q-item-section avatar>
-            <q-icon name="code"/>
+            <q-icon name="fab fa-line"/>
           </q-item-section>
           <q-item-section>
-            <q-item-label>Github</q-item-label>
-            <q-item-label caption>github.com/quasarframework</q-item-label>
+            <q-item-label>绑定 Line</q-item-label>
+            <q-item-label caption>将 Line 帐号与本站帐号绑定</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank"
-                href="http://chat.quasar-framework.org">
+      </q-list>
+      <q-list>
+        <q-item clickable @click="signOut">
           <q-item-section avatar>
-            <q-icon name="chat"/>
+            <q-icon name="logout"/>
           </q-item-section>
           <q-item-section>
-            <q-item-label>Discord Chat Channel</q-item-label>
-            <q-item-label caption>chat.quasar-framework.org</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable tag="a" target="_blank"
-                href="https://forum.quasar-framework.org">
-          <q-item-section avatar>
-            <q-icon name="record_voice_over"/>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Forum</q-item-label>
-            <q-item-label caption>forum.quasar-framework.org</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable tag="a" target="_blank"
-                href="https://twitter.com/quasarframework">
-          <q-item-section avatar>
-            <q-icon name="rss_feed"/>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Twitter</q-item-label>
-            <q-item-label caption>@quasarframework</q-item-label>
+            <q-item-label>登出</q-item-label>
+            <q-item-label caption>退出当前登录的所有帐号</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -94,9 +74,11 @@
 import { openURL } from 'quasar'
 
 export default {
-  name: 'MyLayout',
+  name: 'UserLayout',
   data () {
     return {
+      isShowSwitch: false,
+      isShowBind: false,
       leftDrawerOpen: this.$q.platform.is.desktop
     }
   },
@@ -108,6 +90,26 @@ export default {
     }
   },
   methods: {
+    bindLineCallback () {
+      this.startBindLineProcess()
+    },
+    clickDrawerCallback () {
+      if (this.isLineTokenInLocal() || this.isLineTokenInServer()) {
+        this.isShowSwitch = true
+      } else {
+        this.isShowBind = true
+      }
+    },
+    signOut () {
+      this.$q.localStorage.clear()
+      this.$router.push({ path: '/' })
+      this.$q.notify({
+        color: 'info',
+        icon: 'logout',
+        message: '您已登出',
+        timeout: 500
+      })
+    },
     openURL
   }
 }

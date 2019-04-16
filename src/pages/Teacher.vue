@@ -18,13 +18,13 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      teacherInfo: null
+      teacherInfo: ''
     }
   },
-  created: function () {
+  mounted: function () {
     const that = this
     axios.get('teacher').then((response) => {
-      that.teacherInfo = response['data']['data']
+      that.teacherInfo = response['data']
     }).catch((errorResponse) => {
       let errorMessage = errorResponse.response.data.message
       if (errorResponse.response.status >= 400 &&
