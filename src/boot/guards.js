@@ -24,8 +24,8 @@ export default async ({ app, router, Vue }) => {
     } else if (to.path === '/auth/line') {
       // 接受来自服务器的 line 登录成功数据
     } else if (
-      to.path === 'auth/bind_login' ||
-      to.path === 'auth/bind_register'
+      to.path === '/auth/bind_login' ||
+      to.path === '/auth/bind_register'
     ) {
       if (!Vue.prototype.isLineTokenInLocal()) {
         router.push({ path: '/auth/switch' })
@@ -34,10 +34,16 @@ export default async ({ app, router, Vue }) => {
     } else if (Vue.prototype.isLineTokenInLocal()) {
       // 本地存在已经登录的line身份
 
-    } else if (to.path !== '/auth') {
+    } else {
       // 本地不存在任何用户身份信息
-      router.push({ path: '/auth' })
-      return
+      if (to.path === '/auth' || to.path === '/auth/register') {
+        // router.push({ path: '/auth' })
+        // console.log('wrong1')
+        // return
+        console.log('fine')
+      } else {
+        router.push({ path: '/auth' })
+      }
     }
 
     next()

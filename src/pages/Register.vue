@@ -46,8 +46,8 @@
             :rules="[ val => val && val.length > 0 || 'Please type something']"
           />
 
-          <q-radio v-model="signupType" val="student" label="我是学员"/>
-          <q-radio v-model="signupType" val="teacher" label="我是教师"/>
+          <q-radio v-model="signType" val="student" label="我是学员"/>
+          <q-radio v-model="signType" val="teacher" label="我是教师"/>
 
           <div class="row items-center justify-between">
             <q-btn class="col"
@@ -85,7 +85,7 @@ export default {
     return {
       formHasError: false,
 
-      signupType: 'student',
+      signType: 'student',
       loading: false,
       nickname: null,
       username: null,
@@ -119,41 +119,85 @@ export default {
 
       this.loading = true
       const that = this
-      axios.post('auth/signup', {
-        username: that.username,
-        password: that.password,
-        nickname: that.nickname,
-        signup_type: that.signupType
-      })
-        .then((response) => {
-          this.$q.notify({
-            color: 'info',
-            icon: 'thumb_up',
-            message: '注册成功 !',
-            timeout: 500
+      if (this.$route.path === '/auth/bind_register') {
+        // 如果是在绑定页面注册
+        let url = ''
+        let postContent = {
+          username: this.username,
+          password: this.password,
+          nickname: this.nickname,
+          sign_type: this.signType,
+          is_signup: true
+        }
+
+        if (this.isLineTokenInServer()) {
+          url = this.getLocalTokenType() + '/bind_user'
+        } else if (this.isLineTokenInLocal()) {
+          url = 'line/bind_user'
+          const lineToken = this.$q.localStorage.getItem('line_access_token')
+          postContent['line_token'] = lineToken
+        }
+
+        axios.post(url, postContent)
+          .then((response) => {
+            that.$q.notify({
+              color: 'info',
+              icon: 'thumb_up',
+              message: '注册成功 !',
+              timeout: 500
+            })
+            that.$router.push({ path: '/auth/switch' })
           })
-          const nowTS = new Date()
-          that.$q.localStorage.set('access_token', response.data.access_token)
-          that.$q.localStorage.set('token_type', that.signupType)
-          that.$q.localStorage.set('token_expire_at', nowTS.getTime() + response.data.expires_in * 1000)
-          that.$router.push({ path: '/' })
+          .catch((errorResponse) => {
+            let errorMessage = errorResponse.response.data.message
+            that.$q.notify({
+              multiLine: true,
+              color: 'negative',
+              message: errorMessage
+            })
+          })
+          .then(function () {
+            that.loading = false
+          })
+      } else {
+        // 如果是在非绑定页面注册
+        axios.post('auth/signup', {
+          username: that.username,
+          password: that.password,
+          nickname: that.nickname,
+          sign_type: that.signType
         })
-        .catch((errorResponse) => {
-          const errors = errorResponse.response.data.errors
-          console.log(errors)
-          let errorMessage = ''
-          for (var i in errors) {
-            errorMessage = errorMessage + errors[i] + ' '
+          .then((response) => {
+            const nowTS = new Date()
+            that.updateLocalStorageTokenInfo(
+              response.data.access_token,
+              that.signType,
+              nowTS.getTime() + response.data.expires_in * 1000,
+              response.data.line_exist_in_server
+            )
+
+            this.$q.notify({
+              color: 'info',
+              icon: 'thumb_up',
+              message: '登录成功 !',
+              timeout: 500
+            })
+
+            that.$router.push({ path: '/' })
           }
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
+          )
+          .catch((errorResponse) => {
+            let errorMessage = errorResponse.response.data.message
+            that.$q.notify({
+              multiLine: true,
+              color: 'negative',
+              message: errorMessage
+            })
           })
-        })
-        .then(function () {
-          that.loading = false
-        })
+          .then(function () {
+            that.loading = false
+          })
+      }
     },
 
     onReset () {

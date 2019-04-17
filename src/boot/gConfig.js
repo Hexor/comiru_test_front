@@ -28,11 +28,15 @@ export default async ({ app, router, Vue }) => {
     }
   }
 
-  Vue.prototype.updateLocalStorageTokenInfo = function (accessToken, tokenType, tokenExpireAt) {
+  Vue.prototype.updateLocalStorageTokenInfo = function (accessToken, tokenType, tokenExpireAt, lineExistInServer) {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken
     LocalStorage.set('access_token', accessToken)
     LocalStorage.set('token_type', tokenType)
     LocalStorage.set('token_expire_at', tokenExpireAt)
+
+    if (lineExistInServer) {
+      LocalStorage.set('line_exist_in_server', lineExistInServer)
+    }
   }
 
   Vue.prototype.handleErrorResponse = function (errorResponse) {

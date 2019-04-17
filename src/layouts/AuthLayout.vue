@@ -3,25 +3,33 @@
     <q-header elevated class="bg-primary">
       <q-toolbar>
 
-        <q-avatar >
-          <q-img style="width:28px; height: 28px"
-                 src="/assets/logo.png"></q-img>
-        </q-avatar>
-
+        <q-btn
+          flat
+          v-show="showBackBtn"
+          @click="$router.go(-1)"
+          icon="arrow_back"
+        />
         <q-toolbar-title class="text-center" style="font-weight: bolder;">
           Comiru
         </q-toolbar-title>
+        <q-btn
+          flat
+          v-show="showBackBtn"
+          @click="$router.go(-1)"
+          icon="arrow_back"
+          style="visibility: hidden"
+        />
 
-        <q-avatar style="visibility: hidden">
-          <q-img style="max-width: 25px" contain
-                 src="/assets/favicon.ico"></q-img>
-        </q-avatar>
+        <!--<q-avatar >-->
+        <!--<q-img style="width:28px; height: 28px"-->
+        <!--src="/assets/logo.png"></q-img>-->
+        <!--</q-avatar>-->
         <!--<div>Quasar v{{ $q.version }}</div>-->
       </q-toolbar>
     </q-header>
 
-    <q-page-container >
-      <router-view />
+    <q-page-container>
+      <router-view/>
 
     </q-page-container>
   </q-layout>
@@ -36,14 +44,24 @@ export default {
     return {
       name: null,
       age: null,
-
+      showBackBtn: false,
       accept: false,
       isPwd: true,
       password: null,
       leftDrawerOpen: this.$q.platform.is.desktop
     }
   },
+  beforeRouteUpdate (to, from, next) {
+    if (to.path === '/auth/switch') {
+      console.log('switch now')
+      this.showBackBtn = false
+    } else {
+      this.showBackBtn = true
+    }
+    next()
+  },
   methods: {
+
     onSubmit () {
       this.$refs.name.validate()
       this.$refs.age.validate()
