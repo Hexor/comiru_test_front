@@ -52,7 +52,7 @@ export default async ({ app, router, Vue }) => {
   }
 
   Vue.prototype.openLineLoginWindow = function () {
-    return window.open('https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1564192144&redirect_uri=http://comiru.tt/api/line_auth_callback&state=12345&scope=openid', '_blank', 'width=600,height=400,menubar=no,toolbar=no,location=no')
+    return window.open('https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1564192144&redirect_uri=https://kaiche.co/api/line_auth_callback&state=12345&scope=openid', '_blank', 'width=600,height=400,menubar=no,toolbar=no,location=no')
   }
 
   Vue.prototype.bindSignInTokenWithLineToken = function () {

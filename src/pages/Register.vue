@@ -65,7 +65,7 @@
 
           <div class="row items-center">
             <q-btn
-              @click="$router.push('/auth')"
+              @click="toLoginBtnCallback()"
               class="col" flat color="primary">已有帐号? 前往登录
             </q-btn>
           </div>
@@ -97,11 +97,12 @@ export default {
     }
   },
   methods: {
-    simulateProgress (number) {
-      this.loading = true
-      setTimeout(() => {
-        // we're done, we reset loading state
-      }, 3000)
+    toLoginBtnCallback () {
+      if (this.$route.path === '/auth/bind_register') {
+        this.$router.push('/auth/bind_login')
+      } else {
+        this.$router.push('/auth/login')
+      }
     },
     onSubmit () {
       this.$refs.username.validate()

@@ -77,6 +77,7 @@ module.exports = function (ctx) {
     supportIE: false,
 
     build: {
+      distDir: '../comiru_front_dist',
       scopeHoisting: true,
       // vueRouterMode: 'history',
       // vueCompiler: true,

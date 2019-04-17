@@ -79,7 +79,7 @@ export default {
     return {
       isShowSwitch: false,
       isShowBind: false,
-      leftDrawerOpen: this.$q.platform.is.desktop
+      leftDrawerOpen: false
     }
   },
   mounted: function () {

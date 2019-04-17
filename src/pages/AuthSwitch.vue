@@ -1,10 +1,10 @@
 <template>
-  <div class="q-pa-md" style="max-width: 500px">
+  <div class="q-pa-md full-width " style="">
 
     <div class="row items-center">
       <q-btn
         @click="$router.push('/auth/bind_login')"
-        class="col" flat color="primary">绑定新帐号
+        class="col" flat color="primary">点击绑定新帐号
       </q-btn>
     </div>
     <div>
@@ -30,7 +30,7 @@
               <q-item-label
                 v-if="item.teacher"
                 style="font-size: 15px;"
-                class="text-primary text-h6 cn-bold-font">
+                class="text-h6 cn-bold-font">
                 教师 {{item.teacher.username}}
               </q-item-label>
               <q-item-label
@@ -39,6 +39,9 @@
                 class="text-h6 cn-bold-font">
                 学生 {{item.student.username}}
               </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-icon name="swap_horiz" color="primary"/>
             </q-item-section>
           </q-item>
           <q-separator spaced inset/>
@@ -75,7 +78,7 @@ export default {
     }
     axios.get(url).then((response) => {
       that.lineUsers = response['data']
-      if (!that.lineUsers) {
+      if (that.lineUsers.length === 0) {
         this.noBindCard = true
       }
     }).catch((errorResponse) => {
