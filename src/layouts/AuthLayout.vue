@@ -7,14 +7,14 @@
 
         <q-btn
           flat
-          @click="$router.go(-1)"
+          @click="backBtnCallback()"
           icon="arrow_back"
         />
         <q-toolbar-title class="text-center" style="font-weight: bolder;">
           Comiru
         </q-toolbar-title>
         <q-btn flat @click="confirm = true">
-          <q-icon right name="logout" />
+          <q-icon right name="logout"/>
         </q-btn>
       </q-toolbar>
     </q-header>
@@ -30,9 +30,9 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="取消" color="primary" v-close-popup />
+          <q-btn flat label="取消" color="primary" v-close-popup/>
           <q-btn @click="sureToLogout" flat label="确认登出" color="primary"
-                 v-close-popup />
+                 v-close-popup/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import { openURL } from 'quasar'
 
 export default {
   name: 'AuthLayout',
@@ -67,37 +66,20 @@ export default {
     next()
   },
   methods: {
-    sureToLogout () {
-      this.signOutAndDeleteData()
-    },
-    onSubmit () {
-      this.$refs.name.validate()
-      this.$refs.age.validate()
-
-      if (this.$refs.name.hasError || this.$refs.age.hasError) {
-        this.formHasError = true
-      } else if (this.accept !== true) {
-        this.$q.notify({
-          color: 'negative',
-          message: 'You need to accept the license and terms first'
-        })
+    backBtnCallback () {
+      if (this.$route.path === '/auth/switch') {
+        this.$router.push({ path: '/auth/login' })
+      } else if (this.$route.path === '/auth/bind_register') {
+        this.$router.push({ path: '/auth/bind_login' })
+      } else if (this.$route.path === '/auth/register') {
+        this.$router.push({ path: '/auth/login' })
       } else {
-        this.$q.notify({
-          icon: 'done',
-          color: 'positive',
-          message: 'Submitted'
-        })
+        this.$router.push({ path: '/auth/switch' })
       }
     },
-
-    onReset () {
-      this.name = null
-      this.age = null
-
-      this.$refs.name.resetValidation()
-      this.$refs.age.resetValidation()
-    },
-    openURL
+    sureToLogout () {
+      this.signOutAndDeleteData()
+    }
   }
 }
 </script>

@@ -1,7 +1,7 @@
 // 注册页, 包含首次注册以及注册并绑定新帐号功能
 
 <template>
-  <div class="q-pa-md" style="max-width: 500px">
+  <div class="q-pa-md full-width absolute-center" style="max-width: 500px">
     <q-card bordered class="">
       <q-card-section>
         <div class="text-h6">注册 Comiru</div>

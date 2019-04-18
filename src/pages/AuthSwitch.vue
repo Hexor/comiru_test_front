@@ -64,32 +64,37 @@ export default {
       noBindCard: false
     }
   },
+  mounted: function () {
+    this.refreshData()
+  },
   created: function () {
-    const that = this
-
-    const localTokenType = this.getLocalTokenType()
-    if (!localTokenType) {
-      return
-    }
-
-    const lineToken = this.$q.localStorage.getItem('line_access_token')
-    let url = localTokenType + '/line_users'
-    if (localTokenType === 'line') {
-      url = url + '?line_token=' + lineToken
-    }
-    axios.get(url).then((response) => {
-      that.lineUsers = response['data']
-      if (that.lineUsers.length === 0) {
-        this.noBindCard = true
-      }
-    }).catch((errorResponse) => {
-      this.handleErrorResponse(errorResponse)
-    })
-      .then(function () {
-        that.loading = false
-      })
   },
   methods: {
+    refreshData () {
+      const that = this
+
+      const localTokenType = this.getLocalTokenType()
+      if (!localTokenType) {
+        return
+      }
+
+      const lineToken = this.$q.localStorage.getItem('line_access_token')
+      let url = localTokenType + '/line_users'
+      if (localTokenType === 'line') {
+        url = url + '?line_token=' + lineToken
+      }
+      axios.get(url).then((response) => {
+        that.lineUsers = response['data']
+        if (that.lineUsers.length === 0) {
+          this.noBindCard = true
+        }
+      }).catch((errorResponse) => {
+        this.handleErrorResponse(errorResponse)
+      })
+        .then(function () {
+          that.loading = false
+        })
+    },
     switchUser (item) {
       console.log(item)
       let postContent = {}

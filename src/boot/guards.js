@@ -9,34 +9,77 @@ export default async ({ app, router, Vue }) => {
 
     const nowTS = new Date()
 
-    // TODO 解决2个问题 1. guards 的问题 2. 后退按键的问题
-    switch (to.path) {
-      case '/student':
-        break
-      case '/teacher':
-        break
-      case '/':
-      case '/auth':
-        if (token && tokenExpireTS > nowTS) {
+    if (token && tokenExpireTS > nowTS) {
+      switch (to.path) {
+        case '/student':
+          break
+        case '/teacher':
+          break
+        case '/':
+        case '/auth':
+        case '/auth/register':
+        case '/auth/login':
           router.push({ path: '/' + tokenType })
-        } else if (Vue.prototype.isLineTokenInLocal()) {
+          return
+        case '/auth/bind_login':
+        case '/auth/bind_register':
+          break
+        case '/auth/switch':
+          break
+        case '/auth/line':
+          // 接受来自服务器的 line 登录成功数据
+          break
+        default:
+          break
+      }
+    } else if (
+      Vue.prototype.isLineTokenInLocal() ||
+        Vue.prototype.isLineTokenInServer()
+    ) {
+      switch (to.path) {
+        case '/student':
+          break
+        case '/teacher':
+          break
+        case '/':
+        case '/auth':
+        case '/auth/login':
+        case '/auth/register':
           router.push({ path: '/auth/switch' })
-        } else {
+          return
+        case '/auth/bind_login':
+        case '/auth/bind_register':
+          break
+        case '/auth/switch':
+          break
+        case '/auth/line':
+          // 接受来自服务器的 line 登录成功数据
+          break
+        default:
+          break
+      }
+    } else {
+      switch (to.path) {
+        case '/student':
+        case '/teacher':
+        case '/auth/bind_login':
+        case '/auth/bind_register':
+        case '/auth/switch':
+        case '/':
           router.push({ path: '/auth/login' })
-        }
-        return
-      case '/auth/register':
-        break
-      case '/auth/bind_login':
-      case '/auth/bind_register':
-        break
-      case '/auth/switch':
-        break
-      case '/auth/line':
-        // 接受来自服务器的 line 登录成功数据
-        break
-      default:
+          return
+        case '/auth/line':
+          // 接受来自服务器的 line 登录成功数据
+          break
+        case '/auth':
+        case '/auth/register':
+        case '/auth/login':
+          break
+        default:
+          break
+      }
     }
+
     next()
   })
 }
