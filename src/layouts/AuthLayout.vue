@@ -1,3 +1,5 @@
+// 用户认证相关页面的父组件框架
+
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated class="bg-primary">
@@ -5,26 +7,15 @@
 
         <q-btn
           flat
-          v-show="showBackBtn"
           @click="$router.go(-1)"
           icon="arrow_back"
         />
         <q-toolbar-title class="text-center" style="font-weight: bolder;">
           Comiru
         </q-toolbar-title>
-        <q-btn
-          flat
-          v-show="showBackBtn"
-          @click="$router.go(-1)"
-          icon="arrow_back"
-          style="visibility: hidden"
-        />
-
-        <!--<q-avatar >-->
-        <!--<q-img style="width:28px; height: 28px"-->
-        <!--src="/assets/logo.png"></q-img>-->
-        <!--</q-avatar>-->
-        <!--<div>Quasar v{{ $q.version }}</div>-->
+        <q-btn flat @click="confirm = true">
+          <q-icon right name="logout" />
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -32,7 +23,21 @@
       <router-view/>
 
     </q-page-container>
+    <q-dialog v-model="confirm" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="q-ml-sm">登出当前帐号, 您可能需要重新登录后才能使用所有功能</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="取消" color="primary" v-close-popup />
+          <q-btn @click="sureToLogout" flat label="确认登出" color="primary"
+                 v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-layout>
+
 </template>
 
 <script>
@@ -42,6 +47,7 @@ export default {
   name: 'AuthLayout',
   data () {
     return {
+      confirm: false,
       name: null,
       age: null,
       showBackBtn: false,
@@ -61,7 +67,9 @@ export default {
     next()
   },
   methods: {
-
+    sureToLogout () {
+      this.signOutAndDeleteData()
+    },
     onSubmit () {
       this.$refs.name.validate()
       this.$refs.age.validate()

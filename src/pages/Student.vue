@@ -1,3 +1,5 @@
+// 学员帐号个人信息页
+
 <template>
 
   <q-page>
@@ -12,7 +14,7 @@
 
     </q-card>
     <br>
-    <div class="text-center text-h6">以下是所有的老师, 点击后即可关注</div>
+    <div class="text-center text-h6">以下是所有的教师, 点击后即可关注</div>
 
       <q-scroll-area :offset="250">
 

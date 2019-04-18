@@ -1,3 +1,5 @@
+// 注册页, 包含首次注册以及注册并绑定新帐号功能
+
 <template>
   <div class="q-pa-md" style="max-width: 500px">
     <q-card bordered class="">
@@ -180,11 +182,11 @@ export default {
             this.$q.notify({
               color: 'info',
               icon: 'thumb_up',
-              message: '登录成功 !',
+              message: '注册成功 !',
               timeout: 500
             })
 
-            that.$router.push({ path: '/' })
+            that.$router.push({ path: '/' + that.signType })
           }
           )
           .catch((errorResponse) => {
@@ -199,14 +201,6 @@ export default {
             that.loading = false
           })
       }
-    },
-
-    onReset () {
-      this.name = null
-      this.age = null
-
-      this.$refs.name.resetValidation()
-      this.$refs.age.resetValidation()
     }
   }
 }

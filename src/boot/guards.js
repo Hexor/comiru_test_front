@@ -8,44 +8,35 @@ export default async ({ app, router, Vue }) => {
     const tokenExpireTS = LocalStorage.getItem('token_expire_at')
 
     const nowTS = new Date()
-    if (token && tokenExpireTS > nowTS) {
-      // 本地存在已经登录的用户身份
-      if (to.path === '/auth') {
-        router.push({ path: '/' + tokenType })
-        return
-      }
 
-      if ((to.path === '/student' && tokenType !== 'student') ||
-        (to.path === '/teacher' && tokenType !== 'teacher')
-      ) {
-        router.push({ path: '/auth/switch' })
+    // TODO 解决2个问题 1. guards 的问题 2. 后退按键的问题
+    switch (to.path) {
+      case '/student':
+        break
+      case '/teacher':
+        break
+      case '/':
+      case '/auth':
+        if (token && tokenExpireTS > nowTS) {
+          router.push({ path: '/' + tokenType })
+        } else if (Vue.prototype.isLineTokenInLocal()) {
+          router.push({ path: '/auth/switch' })
+        } else {
+          router.push({ path: '/auth/login' })
+        }
         return
-      }
-    } else if (to.path === '/auth/line') {
-      // 接受来自服务器的 line 登录成功数据
-    } else if (
-      to.path === '/auth/bind_login' ||
-      to.path === '/auth/bind_register'
-    ) {
-      if (!Vue.prototype.isLineTokenInLocal()) {
-        router.push({ path: '/auth/switch' })
-        return
-      }
-    } else if (Vue.prototype.isLineTokenInLocal()) {
-      // 本地存在已经登录的line身份
-
-    } else {
-      // 本地不存在任何用户身份信息
-      if (to.path === '/auth' || to.path === '/auth/register') {
-        // router.push({ path: '/auth' })
-        // console.log('wrong1')
-        // return
-        console.log('fine')
-      } else {
-        router.push({ path: '/auth' })
-      }
+      case '/auth/register':
+        break
+      case '/auth/bind_login':
+      case '/auth/bind_register':
+        break
+      case '/auth/switch':
+        break
+      case '/auth/line':
+        // 接受来自服务器的 line 登录成功数据
+        break
+      default:
     }
-
     next()
   })
 }

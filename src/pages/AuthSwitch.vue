@@ -1,3 +1,5 @@
+// 切换用户页面
+
 <template>
   <div class="q-pa-md full-width " style="">
 
@@ -37,7 +39,7 @@
                 v-if="item.student"
                 style="font-size: 15px;"
                 class="text-h6 cn-bold-font">
-                学生 {{item.student.username}}
+                学员 {{item.student.username}}
               </q-item-label>
             </q-item-section>
             <q-item-section side>
@@ -58,7 +60,6 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      items: [1, 23],
       lineUsers: null,
       noBindCard: false
     }

@@ -1,6 +1,7 @@
 import { LocalStorage } from 'quasar'
 import axios from 'axios'
 
+// 全局属性和方法
 export default async ({ app, router, Vue }) => {
   Vue.prototype.getLocalTokenType = function () {
     const tokenType = LocalStorage.getItem('token_type')
@@ -37,6 +38,17 @@ export default async ({ app, router, Vue }) => {
     if (lineExistInServer) {
       LocalStorage.set('line_exist_in_server', lineExistInServer)
     }
+  }
+
+  Vue.prototype.signOutAndDeleteData = function () {
+    this.$q.localStorage.clear()
+    this.$router.push({ path: '/auth/login' })
+    this.$q.notify({
+      color: 'info',
+      icon: 'logout',
+      message: '您已登出',
+      timeout: 500
+    })
   }
 
   Vue.prototype.handleErrorResponse = function (errorResponse) {

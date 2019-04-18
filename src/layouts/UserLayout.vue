@@ -1,3 +1,5 @@
+// 学员和教师相关页面的父组件框架
+
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated class="bg-primary">
@@ -71,7 +73,6 @@
 </template>
 
 <script>
-import { openURL } from 'quasar'
 
 export default {
   name: 'UserLayout',
@@ -84,7 +85,6 @@ export default {
   },
   mounted: function () {
     const tokenType = this.$q.localStorage.getItem('token_type')
-    console.log('mounted ' + tokenType)
     if (tokenType === 'teacher' || tokenType === 'student') {
       this.$router.push({ path: '/' + tokenType })
     }
@@ -101,16 +101,8 @@ export default {
       }
     },
     signOut () {
-      this.$q.localStorage.clear()
-      this.$router.push({ path: '/' })
-      this.$q.notify({
-        color: 'info',
-        icon: 'logout',
-        message: '您已登出',
-        timeout: 500
-      })
-    },
-    openURL
+      this.signOutAndDeleteData()
+    }
   }
 }
 </script>
