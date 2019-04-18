@@ -2,6 +2,7 @@
 
 module.exports = function (ctx) {
   return {
+    dev: false,
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     boot: [
@@ -81,9 +82,10 @@ module.exports = function (ctx) {
       scopeHoisting: true,
       // vueRouterMode: 'history',
       // vueCompiler: true,
-      // gzip: true,
+      gzip: true,
       // analyze: true,
       // extractCSS: false,
+      APP_URL: 'https://kaiche.co',
       extendWebpack (cfg) {
         cfg.module.rules.push({
           enforce: 'pre',

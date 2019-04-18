@@ -65,13 +65,13 @@ export default async ({ app, router, Vue }) => {
         case '/auth/bind_login':
         case '/auth/bind_register':
         case '/auth/switch':
+        case '/auth':
         case '/':
           router.push({ path: '/auth/login' })
           return
         case '/auth/line':
           // 接受来自服务器的 line 登录成功数据
           break
-        case '/auth':
         case '/auth/register':
         case '/auth/login':
           break

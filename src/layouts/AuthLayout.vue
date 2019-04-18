@@ -6,6 +6,7 @@
       <q-toolbar>
 
         <q-btn
+          :style=backBtnStyle
           flat
           @click="backBtnCallback()"
           icon="arrow_back"
@@ -13,7 +14,9 @@
         <q-toolbar-title class="text-center" style="font-weight: bolder;">
           Comiru
         </q-toolbar-title>
-        <q-btn flat @click="confirm = true">
+        <q-btn
+          :style=backBtnStyle
+          flat @click="confirm = true">
           <q-icon right name="logout"/>
         </q-btn>
       </q-toolbar>
@@ -47,25 +50,41 @@ export default {
   data () {
     return {
       confirm: false,
-      name: null,
-      age: null,
-      showBackBtn: false,
-      accept: false,
-      isPwd: true,
-      password: null,
-      leftDrawerOpen: this.$q.platform.is.desktop
+      backBtnStyle: 'visibility: hidden',
+      logoutBtnStyle: 'visibility: hidden'
+    }
+  },
+  mounted () {
+    if (this.$route.path === '/auth/switch') {
+      this.showBackBtn()
+      this.showLogoutBtn()
     }
   },
   beforeRouteUpdate (to, from, next) {
+    if (to.path === '/auth/login') {
+      this.hideBackBtn()
+      this.hideLogoutBtn()
+    }
+
     if (to.path === '/auth/switch') {
-      console.log('switch now')
-      this.showBackBtn = false
-    } else {
-      this.showBackBtn = true
+      this.showLogoutBtn()
+      this.showBackBtn()
     }
     next()
   },
   methods: {
+    showBackBtn () {
+      this.backBtnStyle = ''
+    },
+    hideBackBtn () {
+      this.backBtnStyle = 'visibility: hidden'
+    },
+    showLogoutBtn () {
+      this.logoutBtnStyle = ''
+    },
+    hideLogoutBtn () {
+      this.logoutBtnStyle = 'visibility: hidden'
+    },
     backBtnCallback () {
       if (this.$route.path === '/auth/switch') {
         this.$router.push({ path: '/auth/login' })
