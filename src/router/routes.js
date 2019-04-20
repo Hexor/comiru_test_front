@@ -24,6 +24,23 @@ const routes = [
         })
       }
     ]
+  },
+  {
+    path: '/admin',
+    component: () => import('layouts/AdminLayout.vue'),
+    children: [
+      { path: 'login', component: () => import('pages/AdminLogin.vue') },
+      { path: 'dashboard',
+        component: () => import('pages/AdminDashboard.vue'),
+        children: [
+          { path: 'student', component: () => import('pages/DashboardStudent.vue') },
+          { path: 'teacher', component: () => import('pages/DashboardTeacher.vue') },
+          { path: 'follow', component: () => import('pages/DashboardFollow.vue') },
+          { path: 'linebind', component: () => import('pages/DashboardLineBind.vue') }
+        ]
+      }
+
+    ]
   }
 ]
 

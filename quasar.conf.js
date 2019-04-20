@@ -44,6 +44,7 @@ module.exports = function (ctx) {
       ],
 
       directives: [
+        'TouchHold',
         'Ripple',
         'GoBack'
       ],

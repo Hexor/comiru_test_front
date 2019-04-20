@@ -11,11 +11,14 @@
           @click="backBtnCallback()"
           icon="arrow_back"
         />
-        <q-toolbar-title class="text-center" style="font-weight: bolder;">
+        <q-toolbar-title
+          v-touch-hold:2000.mouse="handleHold"
+          class="text-center" style="font-weight: bolder;">
           Comiru
         </q-toolbar-title>
         <q-btn
-          :style=backBtnStyle
+          :style=logoutBtnStyle
+
           flat @click="confirm = true">
           <q-icon right name="logout"/>
         </q-btn>
@@ -73,6 +76,9 @@ export default {
     next()
   },
   methods: {
+    handleHold ({ evt, ...info }) {
+      this.$router.push({ path: '/admin/login' })
+    },
     showBackBtn () {
       this.backBtnStyle = ''
     },

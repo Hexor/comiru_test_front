@@ -29,6 +29,17 @@ export default async ({ app, router, Vue }) => {
     }
   }
 
+  Vue.prototype.updateLocalStorageAdminTokenInfo = function (accessToken, tokenExpireAt) {
+    LocalStorage.set('access_token', accessToken)
+    LocalStorage.set('token_expire_at', tokenExpireAt)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken
+  }
+
+  Vue.prototype.removeLocalStorageAdminTokenInfo = function (accessToken, tokenExpireAt) {
+    LocalStorage.remove('admin_access_token')
+    LocalStorage.remove('admin_token_expire_at')
+  }
+
   Vue.prototype.updateLocalStorageTokenInfo = function (accessToken, tokenType, tokenExpireAt, lineExistInServer) {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken
     LocalStorage.set('access_token', accessToken)
