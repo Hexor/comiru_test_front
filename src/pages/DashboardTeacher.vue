@@ -31,31 +31,12 @@
         </q-tr>
       </template>
       <template v-slot:top-left>
-        <!--<q-item>-->
-        <!--<q-item-section >-->
         <q-btn dense color="adminSecondary text-black" :disable="loading"
                label="添加教师"
                @click="addTeacher"/>
-        <!--</q-item-section>-->
-        <!---->
-        <!--<q-item-section >-->
-        <!--</q-item-section>-->
-        <!--<q-item-section side>-->
-        <!--</q-item-section>-->
-        <!--</q-item>-->
       </template>
 
       <template v-slot:top-right>
-        <!--<q-item>-->
-        <!--<q-item-section >-->
-        <!--<q-btn dense color="adminSecondary text-black" :disable="loading"-->
-        <!--icon="plus_circle_outline"-->
-        <!--@click="addRow"/>-->
-        <!--</q-item-section>-->
-        <!---->
-        <!--<q-item-section >-->
-        <!--</q-item-section>-->
-        <!--<q-item-section side>-->
         <q-input dense debounce="300" v-model="filter"
                  color="adminSecondary"
                  placeholder="搜索用户名, id">
@@ -63,8 +44,6 @@
             <q-icon name="search"/>
           </template>
         </q-input>
-        <!--</q-item-section>-->
-        <!--</q-item>-->
       </template>
 
     </q-table>
@@ -72,9 +51,6 @@
       v-model="needConfirmDeleteDialog"
     >
       <q-card style="width: 700px; max-width: 80vw;">
-        <q-card-section>
-          <!--<div class="text-h6">已加密</div>-->
-        </q-card-section>
 
         <q-card-section>
           确认删除该用户吗? 这同时也将删除该用户的 Line 绑定与教师关注数据.
@@ -197,48 +173,13 @@ export default {
           required: true,
           label: '操作',
           align: 'center'
-          // field: row => row.username,
-          // format: val => `${val}`,
-          // sortable: true
         }
-        // {
-        //   name: 'nickname',
-        //   align: 'left',
-        //   label: '昵称',
-        //   field: row => row.nickname,
-        //   sortable: false
-        // },
-        // {
-        //   name: 'created_at',
-        //   align: 'left',
-        //   label: '创建时间',
-        //   field: row => row.created_at,
-        //   sortable: true
-        // }
-        // { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        // { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        // { name: 'carbs', label: 'Carbs (g)', field: 'carbs', sortable: true },
-        // {
-        //   name: 'calcium',
-        //   label: 'Calcium (%)',
-        //   field: 'calcium',
-        //   sortable: true,
-        //   sort: (a, b) => parseInt(a, 10) - parseInt(b, 10)
-        // },
-        // {
-        //   name: 'iron',
-        //   label: 'Iron (%)',
-        //   field: 'iron',
-        //   sortable: true,
-        //   sort: (a, b) => parseInt(a, 10) - parseInt(b, 10)
-        // }
       ],
       data: [],
       editingRow: null
     }
   },
   mounted () {
-    // get initial data from server (1st page)
     var iHeight = window.screen.height
     console.log(iHeight)
     this.pagination.rowsPerPage = Math.round((iHeight - 390) / 40) - 1
@@ -282,14 +223,9 @@ export default {
           })
         })
         .catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
-          })
+          this.handleErrorResponse(errorResponse)
         })
-        .finally(function () {
+        .then(function () {
           that.$q.loading.hide({ delay: 500 })
           that.deletingRow = null
         })
@@ -307,13 +243,8 @@ export default {
           this.fetchFromServer(1, that.pagination.rowsPerPage, '', 'id', true)
         }
         ).catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
-          })
-        }).finally(() => {
+          this.handleErrorResponse(errorResponse)
+        }).then(() => {
           that.$q.loading.hide({ delay: 500 })
           this.newTeacherModel = {
             username: null,
@@ -325,39 +256,12 @@ export default {
     addTeacher () {
       this.createTeacherDialog = true
     },
-    setEditingRow (row) {
-      this.editingRow = row
-      console.log(row)
-    },
-    updateUsername (value, initValue) {
-      console.log('update' + value)
-      this.$q.loading.show({
-        spinner: QSpinnerDots,
-        spinnerSize: 40,
-        spinnerColor: 'primary',
-        backgroundColor: 'white'
-      })
-      setTimeout(() => {
-        this.editingRow.username = 'abcd'
-        this.loading = false
-        this.$q.loading.hide({ delay: 500 })
-      }, 1000)
-    },
     onRequest (props) {
-      console.log('onrequest')
       let { page, rowsPerPage, sortBy, descending } = props.pagination
       let filter = props.filter
-
-      // update rowsCount with appropriate value
-
-      // fetch data from "server"
       this.fetchFromServer(page, rowsPerPage, filter, sortBy, descending)
-
-      // ...and turn of loading indicator
     },
 
-    // emulate ajax call
-    // SELECT * FROM ... WHERE...LIMIT...
     fetchFromServer (page, rowsPerPage, filter, sortBy, descending) {
       console.log(filter)
       this.loading = true
@@ -383,29 +287,6 @@ export default {
         ).finally(() => {
           this.loading = false
         })
-    },
-    getRowsNumberCount (filter) {
-      if (!filter) {
-        return this.original.length
-      }
-      let count = 0
-      this.original.forEach((treat) => {
-        if (treat['name'].includes(filter)) {
-          ++count
-        }
-      })
-      return count
-    },
-    fetchData (hideLoading, emptyContent = false) {
-      if (emptyContent === true) {
-        this.items = []
-        this.disableScroll = false
-      }
-    },
-    onLoad (index, done) {
-      setTimeout(() => {
-        this.fetchData(done)
-      }, 100)
     }
   }
 }

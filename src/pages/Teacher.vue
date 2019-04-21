@@ -50,17 +50,7 @@ export default {
     axios.get('teacher').then((response) => {
       that.teacherInfo = response['data']
     }).catch((errorResponse) => {
-      let errorMessage = errorResponse.response.data.message
-      if (errorResponse.response.status >= 400 &&
-          errorResponse.response.status < 500) {
-        errorMessage = '用户身份已经过期, 请重新登录'
-      }
-      that.$q.notify({
-        multiLine: true,
-        color: 'negative',
-        message: errorMessage
-      })
-      that.$router.push({ path: '/auth' })
+      this.handleErrorResponse(errorResponse)
     })
       .then(function () {
         that.loading = false
@@ -69,17 +59,7 @@ export default {
     axios.get('students').then((response) => {
       that.students = response['data']
     }).catch((errorResponse) => {
-      let errorMessage = errorResponse.response.data.message
-      if (errorResponse.response.status >= 400 &&
-        errorResponse.response.status < 500) {
-        errorMessage = '用户身份已经过期, 请重新登录'
-      }
-      that.$q.notify({
-        multiLine: true,
-        color: 'negative',
-        message: errorMessage
-      })
-      that.$router.push({ path: '/auth' })
+      this.handleErrorResponse(errorResponse)
     })
       .then(function () {
       })

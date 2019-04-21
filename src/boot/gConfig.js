@@ -36,8 +36,7 @@ export default async ({ app, router, Vue }) => {
   }
 
   Vue.prototype.removeLocalStorageAdminTokenInfo = function (accessToken, tokenExpireAt) {
-    LocalStorage.remove('admin_access_token')
-    LocalStorage.remove('admin_token_expire_at')
+    this.$q.localStorage.clear()
   }
 
   Vue.prototype.updateLocalStorageTokenInfo = function (accessToken, tokenType, tokenExpireAt, lineExistInServer) {
@@ -53,6 +52,7 @@ export default async ({ app, router, Vue }) => {
 
   Vue.prototype.signOutAndDeleteData = function () {
     this.$q.localStorage.clear()
+    axios.defaults.headers.common['Authorization'] = null
     this.$router.push({ path: '/auth/login' })
     this.$q.notify({
       color: 'info',
@@ -66,12 +66,14 @@ export default async ({ app, router, Vue }) => {
     let errorMessage = errorResponse.response.data.message
     this.$q.notify({
       multiLine: true,
-      color: 'warning',
+      color: 'negative',
       message: errorMessage,
       timeout: 1500
     })
-    LocalStorage.clear()
-    this.$router.push({ path: '/auth' })
+    if (errorResponse.response.status === 401) {
+      LocalStorage.clear()
+      this.$router.push({ path: '/auth/login' })
+    }
   }
 
   Vue.prototype.openLineLoginWindow = function () {

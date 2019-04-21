@@ -136,12 +136,7 @@ export default {
         }
         )
         .catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
-          })
+          this.handleErrorResponse(errorResponse)
         })
         .then(function () {
           that.loading = false

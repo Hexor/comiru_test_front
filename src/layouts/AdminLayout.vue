@@ -93,14 +93,7 @@ export default {
     backBtnCallback () {
     },
     sureToLogout () {
-      this.removeLocalStorageAdminTokenInfo()
-      this.$router.push({ path: '/auth/login' })
-      this.$q.notify({
-        color: 'info',
-        icon: 'logout',
-        message: '您已退出管理员模式',
-        timeout: 500
-      })
+      this.signOutAndDeleteData()
     }
   }
 }

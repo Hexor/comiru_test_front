@@ -122,7 +122,7 @@ export default {
       this.$refs.password.validate()
       if (
         this.$refs.username.hasError ||
-        this.$refs.password.hasError
+          this.$refs.password.hasError
       ) {
         this.formHasError = true
         return
@@ -158,12 +158,7 @@ export default {
             that.$router.push({ path: '/auth/switch' })
           })
           .catch((errorResponse) => {
-            let errorMessage = errorResponse.response.data.message
-            that.$q.notify({
-              multiLine: true,
-              color: 'negative',
-              message: errorMessage
-            })
+            this.handleErrorResponse(errorResponse)
           })
           .then(function () {
             that.loading = false
@@ -195,12 +190,7 @@ export default {
           }
           )
           .catch((errorResponse) => {
-            let errorMessage = errorResponse.response.data.message
-            that.$q.notify({
-              multiLine: true,
-              color: 'negative',
-              message: errorMessage
-            })
+            this.handleErrorResponse(errorResponse)
           })
           .then(function () {
             that.loading = false

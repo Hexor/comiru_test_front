@@ -10,7 +10,7 @@
       :loading="loading"
       :filter="filter"
       rows-per-page-label="每页显示数量"
-      no-results-label = "没有任何数据"
+      no-results-label="没有任何数据"
       @request="onRequest"
       binary-state-sort
     >
@@ -49,16 +49,6 @@
         </q-tr>
       </template>
       <template v-slot:top-right>
-        <!--<q-item>-->
-        <!--<q-item-section >-->
-        <!--<q-btn dense color="adminSecondary text-black" :disable="loading"-->
-        <!--icon="plus_circle_outline"-->
-        <!--@click="addRow"/>-->
-        <!--</q-item-section>-->
-        <!---->
-        <!--<q-item-section >-->
-        <!--</q-item-section>-->
-        <!--<q-item-section side>-->
         <q-input dense debounce="300" v-model="filter"
                  color="adminSecondary"
                  placeholder="搜索用户名, id">
@@ -66,8 +56,6 @@
             <q-icon name="search"/>
           </template>
         </q-input>
-        <!--</q-item-section>-->
-        <!--</q-item>-->
       </template>
 
     </q-table>
@@ -75,10 +63,6 @@
       v-model="needConfirmDeleteDialog"
     >
       <q-card style="width: 700px; max-width: 80vw;">
-        <q-card-section>
-          <!--<div class="text-h6">已加密</div>-->
-        </q-card-section>
-
         <q-card-section>
           确认删除该用户吗? 这同时也将删除该用户的 Line 绑定与教师关注数据.
         </q-card-section>
@@ -213,14 +197,9 @@ export default {
           })
         })
         .catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
-          })
+          this.handleErrorResponse(errorResponse)
         })
-        .finally(function () {
+        .then(function () {
           that.$q.loading.hide({ delay: 500 })
           that.deletingRow = null
         })
@@ -250,15 +229,10 @@ export default {
           })
         })
         .catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
           this.editingRow.username = initValue
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
-          })
+          this.handleErrorResponse(errorResponse)
         })
-        .finally(function () {
+        .then(function () {
           that.$q.loading.hide({ delay: 500 })
           this.editingRow = null
         })
@@ -268,16 +242,9 @@ export default {
       let { page, rowsPerPage, sortBy, descending } = props.pagination
       let filter = props.filter
 
-      // update rowsCount with appropriate value
-
-      // fetch data from "server"
       this.fetchFromServer(page, rowsPerPage, filter, sortBy, descending)
-
-      // ...and turn of loading indicator
     },
 
-    // emulate ajax call
-    // SELECT * FROM ... WHERE...LIMIT...
     fetchFromServer (page, rowsPerPage, filter, sortBy, descending) {
       let sortMode = 'asc'
       if (descending) {
@@ -292,39 +259,17 @@ export default {
 
           this.data.splice(0, this.data.length, ...returnedData)
 
-          // don't forget to update local pagination object
           this.pagination.page = page
           this.pagination.rowsPerPage = rowsPerPage
           this.pagination.sortBy = sortBy
           this.pagination.descending = descending
           this.pagination.rowsNumber = response['data']['total']
         }
-        ).finally(() => {
+        ).catch((response) => {
+          this.handleErrorResponse(response)
+        }).then(() => {
           this.loading = false
         })
-    },
-    getRowsNumberCount (filter) {
-      if (!filter) {
-        return this.original.length
-      }
-      let count = 0
-      this.original.forEach((treat) => {
-        if (treat['name'].includes(filter)) {
-          ++count
-        }
-      })
-      return count
-    },
-    fetchData (hideLoading, emptyContent = false) {
-      if (emptyContent === true) {
-        this.items = []
-        this.disableScroll = false
-      }
-    },
-    onLoad (index, done) {
-      setTimeout(() => {
-        this.fetchData(done)
-      }, 100)
     }
   }
 }

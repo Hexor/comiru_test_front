@@ -31,16 +31,6 @@
         </q-tr>
       </template>
       <template v-slot:top-right>
-        <!--<q-item>-->
-        <!--<q-item-section >-->
-        <!--<q-btn dense color="adminSecondary text-black" :disable="loading"-->
-        <!--icon="plus_circle_outline"-->
-        <!--@click="addRow"/>-->
-        <!--</q-item-section>-->
-        <!---->
-        <!--<q-item-section >-->
-        <!--</q-item-section>-->
-        <!--<q-item-section side>-->
         <q-input dense debounce="300" v-model="filter"
                  color="adminSecondary"
                  placeholder="搜索用户名">
@@ -48,8 +38,6 @@
             <q-icon name="search"/>
           </template>
         </q-input>
-        <!--</q-item-section>-->
-        <!--</q-item>-->
       </template>
 
     </q-table>
@@ -57,9 +45,6 @@
       v-model="needConfirmDeleteDialog"
     >
       <q-card style="width: 700px; max-width: 80vw;">
-        <q-card-section>
-          <!--<div class="text-h6">已加密</div>-->
-        </q-card-section>
 
         <q-card-section>
           确认断开该关注关系吗?
@@ -68,7 +53,7 @@
           <q-item-label caption
                         style="font-size: 14px">
             {{deletingRow.student.username}} 于 {{deletingRow.created_at}} 关注了
-             {{deletingRow.teacher.username}}
+            {{deletingRow.teacher.username}}
           </q-item-label>
         </q-card-section>
 
@@ -97,9 +82,6 @@ export default {
         student: '',
         teacher: ''
       },
-      selected: [],
-      errorUsername: false,
-      errorMessageUsername: '',
       search: '',
       leaveMessageTextValue: '',
       needConfirmDeleteDialog: false,
@@ -144,48 +126,13 @@ export default {
           required: true,
           label: '操作',
           align: 'center'
-          // field: row => row.username,
-          // format: val => `${val}`,
-          // sortable: true
         }
-        // {
-        //   name: 'nickname',
-        //   align: 'left',
-        //   label: '昵称',
-        //   field: row => row.nickname,
-        //   sortable: false
-        // },
-        // {
-        //   name: 'created_at',
-        //   align: 'left',
-        //   label: '创建时间',
-        //   field: row => row.created_at,
-        //   sortable: true
-        // }
-        // { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        // { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        // { name: 'carbs', label: 'Carbs (g)', field: 'carbs', sortable: true },
-        // {
-        //   name: 'calcium',
-        //   label: 'Calcium (%)',
-        //   field: 'calcium',
-        //   sortable: true,
-        //   sort: (a, b) => parseInt(a, 10) - parseInt(b, 10)
-        // },
-        // {
-        //   name: 'iron',
-        //   label: 'Iron (%)',
-        //   field: 'iron',
-        //   sortable: true,
-        //   sort: (a, b) => parseInt(a, 10) - parseInt(b, 10)
-        // }
       ],
       data: [],
       editingRow: null
     }
   },
   mounted () {
-    // get initial data from server (1st page)
     var iHeight = window.screen.height
     console.log(iHeight)
     this.pagination.rowsPerPage = Math.round((iHeight - 390) / 40) - 1
@@ -229,14 +176,9 @@ export default {
           })
         })
         .catch((errorResponse) => {
-          let errorMessage = errorResponse.response.data.message
-          that.$q.notify({
-            multiLine: true,
-            color: 'negative',
-            message: errorMessage
-          })
+          this.handleErrorResponse(errorResponse)
         })
-        .finally(function () {
+        .then(function () {
           that.$q.loading.hide({ delay: 500 })
           that.deletingRow = {
             student: '',
@@ -244,66 +186,13 @@ export default {
           }
         })
     },
-    getSelectedString () {
-      return this.selected.length === 0 ? '' : `${this.selected.length} record${this.selected.length > 1 ? 's' : ''} selected of ${this.data.length}`
-    },
-    usernameValidation (val) {
-      console.log('call usernameValidation')
-      console.log(val)
-      const that = this
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // call
-          //  resolve(true)
-          //     --> content is valid
-          //  resolve(false)
-          //     --> content is NOT valid, no error message
-          //  resolve(error_message)
-          //     --> content is NOT valid, we have error message
-          that.errorUsername = true
-          that.errorMessageUsername = ' required'
-          resolve(false)
-
-          // calling reject(...) will also mark the input
-          // as having an error, but there will not be any
-          // error message displayed below the input
-          // (only in browser console)
-        }, 1000)
-      })
-    },
-    setEditingRow (row) {
-      this.editingRow = row
-      console.log(row)
-    },
-    updateUsername (value, initValue) {
-      console.log('update' + value)
-      this.$q.loading.show({
-        spinner: QSpinnerDots,
-        spinnerSize: 40,
-        spinnerColor: 'primary',
-        backgroundColor: 'white'
-      })
-      setTimeout(() => {
-        this.editingRow.username = 'abcd'
-        this.loading = false
-        this.$q.loading.hide({ delay: 500 })
-      }, 1000)
-    },
     onRequest (props) {
       console.log('onrequest')
       let { page, rowsPerPage, sortBy, descending } = props.pagination
       let filter = props.filter
-
-      // update rowsCount with appropriate value
-
-      // fetch data from "server"
       this.fetchFromServer(page, rowsPerPage, filter, sortBy, descending)
-
-      // ...and turn of loading indicator
     },
 
-    // emulate ajax call
-    // SELECT * FROM ... WHERE...LIMIT...
     fetchFromServer (page, rowsPerPage, filter, sortBy, descending) {
       this.loading = true
       let sortMode = 'asc'
@@ -325,7 +214,6 @@ export default {
 
           this.data.splice(0, this.data.length, ...returnedData)
 
-          // don't forget to update local pagination object
           this.pagination.page = page
           this.pagination.rowsPerPage = rowsPerPage
           this.pagination.sortBy = sortBy
@@ -347,17 +235,6 @@ export default {
         }
       })
       return count
-    },
-    fetchData (hideLoading, emptyContent = false) {
-      if (emptyContent === true) {
-        this.items = []
-        this.disableScroll = false
-      }
-    },
-    onLoad (index, done) {
-      setTimeout(() => {
-        this.fetchData(done)
-      }, 100)
     }
   }
 }

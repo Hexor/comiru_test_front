@@ -29,6 +29,9 @@ export default async ({ app, router, Vue }) => {
         case '/auth/line':
           // 接受来自服务器的 line 登录成功数据
           break
+        case '/admin/dashboard':
+          router.push({ path: '/admin/dashboard/student' })
+          return
         default:
           break
       }
@@ -55,6 +58,9 @@ export default async ({ app, router, Vue }) => {
         case '/auth/line':
           // 接受来自服务器的 line 登录成功数据
           break
+        case '/admin/dashboard':
+          router.push({ path: '/admin/dashboard/student' })
+          return
         default:
           break
       }
@@ -75,6 +81,9 @@ export default async ({ app, router, Vue }) => {
         case '/auth/register':
         case '/auth/login':
           break
+        case '/admin/dashboard':
+          router.push({ path: '/admin/dashboard/student' })
+          return
         default:
           break
       }
