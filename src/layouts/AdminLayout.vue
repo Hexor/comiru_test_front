@@ -91,15 +91,6 @@ export default {
       this.logoutBtnStyle = 'visibility: hidden'
     },
     backBtnCallback () {
-      if (this.$route.path === '/auth/switch') {
-        this.$router.push({ path: '/auth/login' })
-      } else if (this.$route.path === '/auth/bind_register') {
-        this.$router.push({ path: '/auth/bind_login' })
-      } else if (this.$route.path === '/auth/register') {
-        this.$router.push({ path: '/auth/login' })
-      } else {
-        this.$router.push({ path: '/auth/switch' })
-      }
     },
     sureToLogout () {
       this.removeLocalStorageAdminTokenInfo()
