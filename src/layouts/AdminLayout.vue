@@ -1,4 +1,4 @@
-// 用户认证相关页面的父组件框架
+// 后台管理相关页面的父组件框架
 
 <template>
   <q-layout view="lHh Lpr lFf">

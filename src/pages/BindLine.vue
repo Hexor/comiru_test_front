@@ -18,6 +18,7 @@ export default {
     const nowTS = new Date()
     this.$q.localStorage.set('line_token_expire_at', nowTS.getTime() +
         this.expires_in * 1000)
+    window.close()
   }
 }
 </script>

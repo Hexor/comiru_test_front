@@ -1,4 +1,4 @@
-// 登录页, 包含首次登录以及绑定已有帐号功能
+// 管理员登录页
 
 <template>
   <div class="q-pa-md full-width absolute-center" style="max-width:500px">

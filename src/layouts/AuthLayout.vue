@@ -59,7 +59,7 @@ export default {
   },
   mounted () {
     if (this.$route.path === '/auth/switch') {
-      this.showBackBtn()
+      this.hideBackBtn()
       this.showLogoutBtn()
     }
   },
@@ -67,9 +67,10 @@ export default {
     if (to.path === '/auth/login') {
       this.hideBackBtn()
       this.hideLogoutBtn()
-    }
-
-    if (to.path === '/auth/switch') {
+    } else if (to.path === '/auth/switch') {
+      this.showLogoutBtn()
+      this.hideBackBtn()
+    } else {
       this.showLogoutBtn()
       this.showBackBtn()
     }

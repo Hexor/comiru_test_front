@@ -29,14 +29,14 @@ const routes = [
     path: '/admin',
     component: () => import('layouts/AdminLayout.vue'),
     children: [
-      { path: 'login', component: () => import('pages/AdminLogin.vue') },
+      { path: 'login', component: () => import('pages/admin/AdminLogin.vue') },
       { path: 'dashboard',
-        component: () => import('pages/AdminDashboard.vue'),
+        component: () => import('pages/admin/AdminDashboard.vue'),
         children: [
-          { path: 'student', component: () => import('pages/DashboardStudent.vue') },
-          { path: 'teacher', component: () => import('pages/DashboardTeacher.vue') },
-          { path: 'follow', component: () => import('pages/DashboardFollow.vue') },
-          { path: 'linebind', component: () => import('pages/DashboardLineBind.vue') }
+          { path: 'student', component: () => import('pages/admin/DashboardStudent.vue') },
+          { path: 'teacher', component: () => import('pages/admin/DashboardTeacher.vue') },
+          { path: 'follow', component: () => import('pages/admin/DashboardFollow.vue') },
+          { path: 'linebind', component: () => import('pages/admin/DashboardLineBind.vue') }
         ]
       }
 

@@ -20,6 +20,14 @@
       <q-separator inset/>
 
     </q-card>
+    <q-card v-show="!noBindCard" bordered class="">
+      <q-card-section>
+        <div class="text-body2">以下是您的Line当前绑定的帐号({{bindsUserCount}}个子帐号)</div>
+      </q-card-section>
+
+      <q-separator inset/>
+
+    </q-card>
     <q-page>
 
       <q-scroll-area :offset="250">
@@ -60,6 +68,7 @@ import axios from 'axios'
 export default {
   data () {
     return {
+      bindsUserCount: 0,
       lineUsers: null,
       noBindCard: false
     }
@@ -85,8 +94,11 @@ export default {
       }
       axios.get(url).then((response) => {
         that.lineUsers = response['data']
-        if (that.lineUsers.length === 0) {
+        if (!that.lineUsers.length || that.lineUsers.length === 0) {
           this.noBindCard = true
+        } else {
+          this.noBindCard = false
+          this.bindsUserCount = that.lineUsers.length
         }
       }).catch((errorResponse) => {
         this.handleErrorResponse(errorResponse)

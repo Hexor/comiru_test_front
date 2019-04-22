@@ -1,3 +1,5 @@
+// 管理员后台管理面板, 面板下包含 4 个 Tab, 每个 Tab 都是本面板的子组件
+
 <template>
   <q-page >
     <q-tabs

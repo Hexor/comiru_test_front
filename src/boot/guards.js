@@ -9,7 +9,7 @@ export default async ({ app, router, Vue }) => {
 
     const nowTS = new Date()
 
-    if (token && tokenExpireTS > nowTS) {
+    if (token && tokenExpireTS > nowTS && tokenType) {
       switch (to.path) {
         case '/student':
           break

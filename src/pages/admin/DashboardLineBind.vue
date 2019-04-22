@@ -1,7 +1,9 @@
+// 管理用户绑定的 Line 帐号数据
+
 <template>
   <div class="q-pa-md">
     <q-table
-      title="教师管理"
+      title="Line 管理"
       class="cn-bold-font"
       :data="data"
       :columns="columns"
@@ -16,30 +18,26 @@
     >
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="id" :props="props">
-            {{ props.row.id }}
-          </q-td>
+          <!--<q-td key="id" :props="props">-->
+          <!--{{ props.row.id}}-->
+          <!--</q-td>-->
           <q-td key="username" :props="props">
-            {{ props.row.username }}
+            {{ props.row.username}}
+            <br>
+            {{ props.row.id}}
           </q-td>
           <q-td key="delete" :props="props">
             <q-btn color="adminTitle"
                    dense
-                   @click="deleteUserBtnCallback(props.row)"
+                   @click="deleteBtnCallback(props.row)"
                    icon="delete_outline"/>
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:top-left>
-        <q-btn dense color="adminSecondary text-black" :disable="loading"
-               label="添加教师"
-               @click="addTeacher"/>
-      </template>
-
       <template v-slot:top-right>
         <q-input dense debounce="300" v-model="filter"
                  color="adminSecondary"
-                 placeholder="搜索用户名, id">
+                 placeholder="搜索用户名, Line ID">
           <template v-slot:append>
             <q-icon name="search"/>
           </template>
@@ -53,12 +51,14 @@
       <q-card style="width: 700px; max-width: 80vw;">
 
         <q-card-section>
-          确认删除该用户吗? 这同时也将删除该用户的 Line 绑定与教师关注数据.
+          确认断开该绑定关系吗?
         </q-card-section>
         <q-card-section caption>
           <q-item-label caption
                         style="font-size: 14px">
-            {{deletingRow}}
+            {{deletingRow.username}} 在 <br> {{deletingRow.created_at}} 绑定了
+            Line
+
           </q-item-label>
         </q-card-section>
 
@@ -66,39 +66,8 @@
           <q-btn color="" flat label="关闭" v-close-dialog/>
           <q-btn class="text-white bg-adminTitle" label="确认删除"
                  v-close-dialog
-                 v-on:click="sureToDeleteUser"
+                 v-on:click="sureToDelete"
           />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-dialog v-model="createTeacherDialog" persistent>
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">创建新教师帐号</div>
-        </q-card-section>
-
-        <q-card-section>
-          <q-input v-model="newTeacherModel.username"
-                   color="adminSecondary"
-                   placeholder='用户名'
-                   :rules="[ val => val.length <= 10 ||
-'用户名最长 10 位']"
-                   autofocus/>
-          <q-input v-model="newTeacherModel.password"
-                   color="adminSecondary"
-                   :rules="[ val => (val.length >= 6 && val.length < 20)||
-                   '密码长度最少6位, 最长20位']"
-                   placeholder='密码'
-          />
-          <q-input v-model="newTeacherModel.nickname"
-                   color="adminSecondary"
-                   placeholder='昵称'
-          />
-        </q-card-section>
-
-        <q-card-actions align="right" class="text-adminTitle">
-          <q-btn flat label="取消" v-close-popup/>
-          <q-btn flat label="创建" v-close-popup @click="createTeacher"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -111,62 +80,30 @@ import axios from 'axios'
 import { QSpinnerDots } from 'quasar'
 
 export default {
-  // name: 'PageName',
   data () {
     return {
-      selected: [],
-      newTeacherModel: {
-        username: null,
-        password: null,
-        nickname: null
+      deletingRow: {
+        created_at: null,
+        username: null
       },
-      errorUsername: false,
-      errorMessageUsername: '',
-      search: '',
-      leaveMessageTextValue: '',
-      needLoginDialog: false,
-      tgLoginDialogStatus: false,
-      confirm: false,
-      contactCard: false,
-      disableScroll: false,
-      show: true,
-      componentKey: 0,
-      page: 1,
-      items: [],
-      info: '',
-      createTeacherDialog: false,
-      targetItem: [],
-      messagePlaceHolder: '',
-      requestListPrefix: '',
-      filter: '',
-      deletingRow: null,
       needConfirmDeleteDialog: false,
+      filter: '',
       loading: false,
       pagination: {
-        sortBy: 'id',
+        sortBy: 'updated_at',
         descending: true,
         page: 1,
-        rowsPerPage: 10,
+        rowsPerPage: 3,
         rowsNumber: 10
       },
       columns: [
         {
-          name: 'id',
-          required: true,
-          label: 'ID',
-          align: 'left',
-          field: row => row.id,
-          format: val => `${val}`,
-          sortable: true
-        },
-        {
           name: 'username',
           required: true,
-          label: '用户名',
+          label: '用户名(Line ID)',
           align: 'left',
           field: row => row.username,
-          format: val => `${val}`,
-          sortable: true
+          format: val => `${val}`
         },
         {
           name: 'delete',
@@ -192,18 +129,26 @@ export default {
     })
   },
   methods: {
-    removeUserFromDisplay (id) {
+    removeFromDisplay (signType, userID) {
       for (var i = 0; i < this.data.length; i++) {
-        if (this.data[i]['id'] === id) {
-          this.data.splice(i, 1)
+        if (this.data[i]['sign_type'] === signType) {
+          if (signType === 'teacher') {
+            if (this.data[i]['teacher_id'] === userID) {
+              this.data.splice(i, 1)
+            }
+          } else if (signType === 'student') {
+            if (this.data[i]['student_id'] === userID) {
+              this.data.splice(i, 1)
+            }
+          }
         }
       }
     },
-    deleteUserBtnCallback (row) {
+    deleteBtnCallback (row) {
       this.deletingRow = row
       this.needConfirmDeleteDialog = true
     },
-    sureToDeleteUser () {
+    sureToDelete () {
       const row = this.deletingRow
       this.$q.loading.show({
         spinner: QSpinnerDots,
@@ -212,9 +157,15 @@ export default {
         backgroundColor: 'white'
       })
       const that = this
-      axios.delete('admin/teachers/' + row.id)
+      let userID = 0
+      if (row.sign_type === 'teacher') {
+        userID = row.teacher_id
+      } else {
+        userID = row.student_id
+      }
+      axios.delete('admin/line_users/' + row.sign_type + '/' + userID)
         .then((response) => {
-          that.removeUserFromDisplay(row.id)
+          that.removeFromDisplay(row.sign_type, userID)
           this.$q.notify({
             color: 'adminPrimary',
             icon: 'delete_outline',
@@ -227,64 +178,37 @@ export default {
         })
         .then(function () {
           that.$q.loading.hide({ delay: 500 })
-          that.deletingRow = null
-        })
-    },
-    createTeacher () {
-      this.$q.loading.show({
-        spinner: QSpinnerDots,
-        spinnerSize: 40,
-        spinnerColor: 'adminSecondary',
-        backgroundColor: 'white'
-      })
-      const that = this
-      axios.post('admin/teachers', this.newTeacherModel)
-        .then((response) => {
-          this.fetchFromServer(1, that.pagination.rowsPerPage, '', 'id', true)
-        }
-        ).catch((errorResponse) => {
-          this.handleErrorResponse(errorResponse)
-        }).then(() => {
-          that.$q.loading.hide({ delay: 500 })
-          this.newTeacherModel = {
-            username: null,
-            password: null,
-            nickname: null
+          that.deletingRow = {
+            student: '',
+            teacher: ''
           }
         })
     },
-    addTeacher () {
-      this.createTeacherDialog = true
-    },
     onRequest (props) {
+      console.log('onrequest')
       let { page, rowsPerPage, sortBy, descending } = props.pagination
       let filter = props.filter
+
       this.fetchFromServer(page, rowsPerPage, filter, sortBy, descending)
     },
 
     fetchFromServer (page, rowsPerPage, filter, sortBy, descending) {
-      console.log(filter)
       this.loading = true
-      let sortMode = 'asc'
-      if (descending) {
-        sortMode = 'desc'
-      }
-
-      axios.get('admin/teachers' + '?page_size=' + rowsPerPage + '&page=' +
-          page + '&keyword=' + filter + '&sort=' + sortBy + '|' + sortMode)
+      axios.get('admin/line_users' + '?page_size=' + rowsPerPage + '&page=' +
+          page +
+          '&keyword=' + filter + '&sort=' + sortBy + '|desc')
         .then((response) => {
           const returnedData = response['data']['data']
 
           this.data.splice(0, this.data.length, ...returnedData)
 
-          // don't forget to update local pagination object
           this.pagination.page = page
           this.pagination.rowsPerPage = rowsPerPage
           this.pagination.sortBy = sortBy
           this.pagination.descending = descending
           this.pagination.rowsNumber = response['data']['total']
         }
-        ).finally(() => {
+        ).then(() => {
           this.loading = false
         })
     }
