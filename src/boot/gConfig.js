@@ -72,7 +72,11 @@ export default async ({ app, router, Vue }) => {
     })
     if (errorResponse.response.status === 401) {
       LocalStorage.clear()
-      this.$router.push({ path: '/auth/login' })
+      let redirectPath = '/auth/login'
+      if (errorResponse.response.data.redirect_path) {
+        redirectPath = errorResponse.response.data.redirect_path
+      }
+      this.$router.push({ path: redirectPath })
     }
   }
 
@@ -92,12 +96,14 @@ export default async ({ app, router, Vue }) => {
           that.$q.notify({
             color: 'info',
             icon: 'thumb_up',
-            message: '绑定成功!',
+            message: 'Line 登录成功!',
             timeout: 500
           })
           that.$router.push({ path: '/auth/switch' })
         })
         .catch((errorResponse) => {
+          LocalStorage.remove('access_token')
+          LocalStorage.remove('line_access_token')
           that.handleErrorResponse(errorResponse)
         })
         .then(function () {
